@@ -25,7 +25,7 @@ api/
 │   ├── config/
 │   │   └── config.go            Env-var config struct (PORT, DATABASE_URL)
 │   ├── middleware/
-│   │   └── request_id.go        Request ID + access-log middleware (chi)
+│   │   └── logging.go           Request ID + access-log middleware (Huma)
 │   ├── feed/
 │   │   ├── routes.go            Huma route registration for /feeds, /feeds/{id}, /feeds/refresh
 │   │   ├── service.go           Feed refresh logic (fetch, parse, upsert posts)
@@ -58,23 +58,29 @@ calls query methods — only request handlers do).
 All logging is structured JSON via `slog.NewJSONHandler` (configured once in `cmd/api/main.go`,
 `slog.SetDefault`'d so anything not request-scoped still logs JSON).
 
-`internal/middleware/request_id.go`'s `RequestID` middleware generates a **UUIDv7** (`uuid.NewV7()` — time-ordered,
-so request IDs sort chronologically and stay grep-friendly across log aggregation) per request, derives a logger
-via `base.With("request_id", id.String())`, and stores it in the request context. It also logs one structured
-`"request"` line per completed request (`method`, `path`, `status`, `duration_ms`, `remote_addr`).
+`internal/middleware/logging.go`'s `Logging` middleware is a **Huma** middleware (`api.UseMiddleware`, not chi), so
+it only wraps registered operations. It generates a **UUIDv7** (`uuid.NewV7()` — time-ordered, so request IDs sort
+chronologically and stay grep-friendly across log aggregation) per request, derives a logger via
+`base.With("request_id", id.String())`, and stores it in the request context. It also logs one structured
+`"http_request"` line per completed request (`method`, `path`, `query`, `status`, `duration_s`, `remote_addr`) —
+at `ERROR` level for 5xx, `INFO` otherwise, since every 4xx here is the API working correctly.
 
-Route handlers must fetch the request-scoped logger with `apimiddleware.LoggerFromContext(ctx)` — never
-`slog.Default()` or a package-level logger — so every log line a handler emits carries the same `request_id` as the
-access log for that request. See any handler in `internal/feed/routes.go` or `internal/post/routes.go` for the
-pattern:
+Route handlers must fetch the request-scoped logger out of the context — never `slog.Default()` or a package-level
+logger — so every log line a handler emits carries the same `request_id` as the access log for that request. See any
+handler in `internal/feed/routes.go` or `internal/post/routes.go` for the pattern:
 
 ```go
 func(ctx context.Context, input *X) (*Y, error) {
-    logger := apimiddleware.LoggerFromContext(ctx)
+    logger := ctx.Value("logger").(*slog.Logger)
     logger.Info("doing the thing", "some_field", value)
     ...
 }
 ```
+
+The assertion is deliberately unchecked: the middleware runs for every registered operation, so a missing logger is
+a wiring bug that should fail loudly rather than silently degrade to an uncorrelated logger. That makes
+`api.UseMiddleware(apimiddleware.Logging(...))` part of the contract for anything building the API — including the
+`newTestRouter` helpers in `routes_test.go`.
 
 ## humacli execution model
 

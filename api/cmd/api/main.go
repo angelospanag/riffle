@@ -27,9 +27,9 @@ import (
 // against the given queries implementation.
 func newRouter(queries db.Querier, logger *slog.Logger) (*chi.Mux, huma.API) {
 	router := chi.NewMux()
-	router.Use(apimiddleware.RequestID(logger))
 
 	api := humachi.New(router, huma.DefaultConfig("Riffle API", "1.0.0"))
+	api.UseMiddleware(apimiddleware.Logging(logger))
 
 	feed.RegisterRoutes(api, queries, logger)
 	post.RegisterRoutes(api, queries, logger)

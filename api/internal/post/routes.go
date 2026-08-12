@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/angelospanag/riffle/internal/db"
-	apimiddleware "github.com/angelospanag/riffle/internal/middleware"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5"
 )
@@ -25,7 +24,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Mark all posts in a feed as read",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *MarkAllReadInput) (*struct{}, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("marking all posts as read", "feed_id", input.FeedID)
 
 		err := service.MarkAllPostsAsRead(ctx, input.FeedID)
@@ -45,7 +44,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Get the number of unread posts for a specific feed",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *CountUnreadByFeedInput) (*CountUnreadOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("counting unread posts by feed", "feed_id", input.FeedID)
 
 		count, err := service.CountUnreadPostsByFeed(ctx, input.FeedID)
@@ -69,7 +68,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Retrieve posts with optional filters (feed_id, unread_only)",
 		Tags:        []string{"posts"},
 	}, func(ctx context.Context, input *ListInput) (*ListOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("listing posts",
 			"limit", input.Limit,
 			"offset", input.Offset,
@@ -130,7 +129,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Retrieve a specific post by ID",
 		Tags:        []string{"posts"},
 	}, func(ctx context.Context, input *GetInput) (*GetOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("getting post", "post_id", input.PostID)
 
 		post, err := service.GetPost(ctx, input.PostID)
@@ -155,7 +154,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Update the read status of a post",
 		Tags:        []string{"posts"},
 	}, func(ctx context.Context, input *MarkReadInput) (*struct{}, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("marking post", "post_id", input.PostID, "is_read", input.Body.IsRead)
 
 		var err error
@@ -181,7 +180,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Get the total number of unread posts",
 		Tags:        []string{"posts"},
 	}, func(ctx context.Context, input *struct{}) (*CountUnreadOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("counting unread posts")
 
 		count, err := service.CountUnreadPosts(ctx)

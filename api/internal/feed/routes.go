@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/angelospanag/riffle/internal/db"
-	apimiddleware "github.com/angelospanag/riffle/internal/middleware"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -111,7 +110,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Tags:          []string{"feeds"},
 		DefaultStatus: http.StatusCreated,
 	}, func(ctx context.Context, input *CreateInput) (*CreateOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("creating feed", "url", input.Body.URL)
 
 		if err := service.ValidateFeed(ctx, input.Body.URL); err != nil {
@@ -152,7 +151,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Retrieve all RSS feeds",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *struct{}) (*ListOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("listing feeds")
 
 		feeds, err := service.GetQueries().ListFeeds(ctx)
@@ -177,7 +176,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Retrieve a specific RSS feed by ID",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *GetInput) (*GetOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("getting feed", "feed_id", input.FeedID)
 
 		feed, err := service.GetQueries().GetFeed(ctx, input.FeedID)
@@ -202,7 +201,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Update an existing RSS feed",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *UpdateInput) (*UpdateOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("updating feed", "feed_id", input.FeedID)
 
 		feed, err := service.GetQueries().UpdateFeed(ctx, db.UpdateFeedParams{
@@ -238,7 +237,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Remove an RSS feed and all its posts",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *DeleteInput) (*struct{}, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("deleting feed", "feed_id", input.FeedID)
 
 		err := service.GetQueries().DeleteFeed(ctx, input.FeedID)
@@ -258,7 +257,7 @@ func RegisterRoutes(api huma.API, querier db.Querier, logger *slog.Logger) {
 		Description: "Fetch new posts from all feeds or a specific feed",
 		Tags:        []string{"feeds"},
 	}, func(ctx context.Context, input *RefreshInput) (*RefreshOutput, error) {
-		logger := apimiddleware.LoggerFromContext(ctx)
+		logger := ctx.Value("logger").(*slog.Logger)
 		logger.Info("refreshing feeds")
 
 		var feedsUpdated, postsAdded int

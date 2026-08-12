@@ -9,6 +9,7 @@ import (
 
 	"github.com/angelospanag/riffle/internal/db"
 	"github.com/angelospanag/riffle/internal/feed"
+	apimiddleware "github.com/angelospanag/riffle/internal/middleware"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humachi"
 	"github.com/go-chi/chi/v5"
@@ -90,6 +91,7 @@ func (m *mockQuerier) ListFeeds(_ context.Context) ([]db.Feed, error) {
 func newTestRouter(q db.Querier) *chi.Mux {
 	router := chi.NewMux()
 	api := humachi.New(router, huma.DefaultConfig("test", "1.0.0"))
+	api.UseMiddleware(apimiddleware.Logging(slog.Default()))
 	feed.RegisterRoutes(api, q, slog.Default())
 	return router
 }

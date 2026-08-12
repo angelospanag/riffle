@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/angelospanag/riffle/internal/db"
-	apimiddleware "github.com/angelospanag/riffle/internal/middleware"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/mmcdole/gofeed"
 )
@@ -54,7 +53,7 @@ func (s *Service) ValidateFeed(ctx context.Context, feedURL string) error {
 
 // RefreshFeed fetches and updates posts for a specific feed
 func (s *Service) RefreshFeed(ctx context.Context, feedID int32) (int, error) {
-	logger := apimiddleware.LoggerFromContext(ctx)
+	logger := ctx.Value("logger").(*slog.Logger)
 	logger.Info("refreshing feed", "feed_id", feedID)
 
 	// Get feed details
@@ -168,7 +167,7 @@ func (s *Service) RefreshFeed(ctx context.Context, feedID int32) (int, error) {
 
 // RefreshAllFeeds fetches and updates posts for all feeds
 func (s *Service) RefreshAllFeeds(ctx context.Context) (int, int, error) {
-	logger := apimiddleware.LoggerFromContext(ctx)
+	logger := ctx.Value("logger").(*slog.Logger)
 	logger.Info("refreshing all feeds")
 
 	feeds, err := s.queries.ListFeeds(ctx)
