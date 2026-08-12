@@ -53,6 +53,23 @@ against a hand-rolled `mockQuerier` (see `internal/feed/routes_test.go`) with no
 `openapi` subcommand call it (the subcommand passes `nil` for `queries`, which is safe because registration never
 calls query methods — only request handlers do).
 
+## Server middleware chain
+
+`newRouter` returns the bare router; the transport-level middleware is chained around it in `main.go`, so the
+`openapi` subcommand never pays for it:
+
+```go
+handler := chi.Chain(chimw.Recoverer, compressor.Handler).Handler(router)
+```
+
+`Recoverer` is **outermost on purpose** — chain order is outside-in, so it also catches panics raised inside the
+compressor, which would otherwise leave a truncated compressed body on the wire. The compressor is chi's, with a
+brotli encoder registered on top of the built-in gzip/deflate (`compressor.SetEncoder("br", ...)`); brotli wins
+when a client offers both. Post bodies are HTML-heavy JSON, so this is where the bandwidth goes.
+
+Request logging is *not* in this chain — it's a Huma middleware (see below), so it only covers registered
+operations rather than every byte the server serves.
+
 ## Logging
 
 All logging is structured JSON via `slog.NewJSONHandler` (configured once in `cmd/api/main.go`,
