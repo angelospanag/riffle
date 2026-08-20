@@ -4,9 +4,9 @@ package middleware
 import (
 	"log/slog"
 	"time"
+	"uuid"
 
 	"github.com/danielgtaylor/huma/v2"
-	"github.com/google/uuid"
 )
 
 // Logging logs one line per request and attaches a logger carrying the request id to the
@@ -15,7 +15,7 @@ func Logging(base *slog.Logger) func(huma.Context, func(huma.Context)) {
 	return func(ctx huma.Context, next func(huma.Context)) {
 		start := time.Now()
 
-		logger := base.With("request_id", uuid.Must(uuid.NewV7()).String())
+		logger := base.With("request_id", uuid.NewV7().String())
 		ctx = huma.WithValue(ctx, "logger", logger)
 
 		next(ctx)
