@@ -1,6 +1,6 @@
 [tools]
-go = "1.27.0"
-golangci-lint = "2.13.1"
+go = "1.27.1"
+golangci-lint = "2.13.2"
 sqlc = "1.31.1"
 
 [tasks.dev]
