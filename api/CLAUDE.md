@@ -163,3 +163,9 @@ Tests mock `db.Querier` directly — no database or service container needed in 
 3. Add the new method to any mock implementations of `db.Querier` used in tests.
 
 Huma generates OpenAPI docs automatically at `/docs` (Swagger UI).
+
+## Container image
+
+`Containerfile` builds a static binary on `golang:1.27.3-trixie` and ships it on
+`gcr.io/distroless/static-debian13:nonroot`, so the API runs as uid 65532 on port 8080. Go and golangci-lint versions
+are pinned in `mise.toml`.

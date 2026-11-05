@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ── Build stage ───────────────────────────────────────────────────────────────
-FROM oven/bun:1.4.1-debian AS builder
+FROM oven/bun:1.4.4-debian AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ COPY . .
 RUN bun run build
 
 # ── Run stage ─────────────────────────────────────────────────────────────────
-FROM oven/bun:1.4.1-distroless AS runner
+FROM oven/bun:1.4.4-distroless AS runner
 
 WORKDIR /app
 
@@ -24,8 +24,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static     ./.next/static
+# Distroless Bun defaults to root. Own the app files so Next can write .next/cache.
+COPY --from=builder --chown=65532:65532 /app/.next/standalone ./
+COPY --from=builder --chown=65532:65532 /app/.next/static     ./.next/static
+
+USER 65532:65532
 
 EXPOSE 3000
 
