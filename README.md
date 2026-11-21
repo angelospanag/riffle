@@ -25,8 +25,6 @@ frontend.
 | <picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/04-add-feed-dark.jpg"><img alt="Adding a new feed from the sidebar" src="docs/screenshots/04-add-feed.jpg"></picture> | <img alt="The same post in light and dark themes, split diagonally" src="docs/screenshots/05-light-dark.jpg"> |
 | **Add a feed** — paste a URL, favicon is discovered automatically | **Light & dark** — follows your system theme |
 
-Screenshots follow your GitHub theme — switch between light and dark to see both.
-
 ## Repo layout
 
 ```
