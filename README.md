@@ -14,6 +14,19 @@ frontend.
 - Type-safe queries (SQLC) & auto-generated OpenAPI docs, with a TypeScript client generated from the spec via
   [hey-api](https://heyapi.dev)
 
+## Screenshots
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/01-reader-dark.jpg"><img alt="Reading a Go Blog post in the three-column layout" src="docs/screenshots/01-reader.jpg"></picture>
+
+| | |
+| --- | --- |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/02-feed-posts-dark.jpg"><img alt="Simon Willison feed with read and unread posts" src="docs/screenshots/02-feed-posts.jpg"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/03-unread-only-dark.jpg"><img alt="All feeds filtered to unread only" src="docs/screenshots/03-unread-only.jpg"></picture> |
+| **Per-feed view** — read posts dim, unread counts per feed | **Unread only** — filter across every feed |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/04-add-feed-dark.jpg"><img alt="Adding a new feed from the sidebar" src="docs/screenshots/04-add-feed.jpg"></picture> | |
+| **Add a feed** — paste a URL, favicon is discovered automatically | |
+
+Screenshots follow your GitHub theme — switch between light and dark to see both.
+
 ## Repo layout
 
 ```
