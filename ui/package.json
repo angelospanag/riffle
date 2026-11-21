@@ -13,26 +13,26 @@
   },
   "dependencies": {
     "@hey-api/client-next": "^0.5.1",
-    "@tanstack/react-query": "^5.106.1",
-    "lucide-react": "^1.69.0",
-    "next": "16.4.5",
+    "@tanstack/react-query": "^5.108.2",
+    "lucide-react": "^1.77.0",
+    "next": "16.4.6",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.5",
+    "@biomejs/biome": "2.6.8",
     "@hey-api/openapi-ts": "^0.99.0",
-    "@tailwindcss/postcss": "^4.3.4",
+    "@tailwindcss/postcss": "^4.3.5",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "tailwindcss": "^4.3.4",
+    "tailwindcss": "^4.3.5",
     "typescript": "^7.0.2"
   },
   "overrides": {
     "js-yaml": "^4.3.1"
   },
-  "packageManager": "bun@1.4.1",
+  "packageManager": "bun@1.4.5",
   "ignoreScripts": [
     "sharp",
     "unrs-resolver"
